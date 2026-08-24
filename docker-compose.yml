@@ -1,0 +1,52 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: ${ECR_REGISTRY:-local}/flower-frontend:${IMAGE_TAG:-latest}
+    container_name: flower-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: ${ECR_REGISTRY:-local}/flower-backend:${IMAGE_TAG:-latest}
+    container_name: flower-backend
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-flower_shop}
+      DB_USER: ${DB_USER:-floweradmin}
+      DB_PASSWORD: ${DB_PASSWORD:-change-me}
+    expose:
+      - "5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    container_name: flower-db
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-flower_shop}
+      MYSQL_USER: ${DB_USER:-floweradmin}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-change-me}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root-change-me}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
