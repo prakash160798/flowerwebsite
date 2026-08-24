@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-
-        ECR_REGISTRY = '955501536964'.dkr.ecr.us-east-1.amazonaws.com'
+        ECR_REGISTRY = '955501536964.dkr.ecr.us-east-1.amazonaws.com'
 
         FRONTEND_REPO = 'flower-frontend'
         BACKEND_REPO = 'flower-backend'
@@ -56,7 +55,7 @@ pipeline {
                     echo "Logging in to Amazon ECR..."
 
                     aws ecr get-login-password \
-                    --region ${AWS_REGION} |
+                    --region ${AWS_REGION} | \
                     docker login \
                     --username AWS \
                     --password-stdin ${ECR_REGISTRY}
@@ -89,7 +88,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Docker images successfully pushed to Amazon ECR.'
-                echo 'Application deployment will be configured next.'
+                echo 'Deployment will be configured next.'
             }
         }
     }
@@ -97,7 +96,7 @@ pipeline {
     post {
         success {
             echo '========================================='
-            echo '      PIPELINE COMPLETED SUCCESSFULLY'
+            echo '     PIPELINE COMPLETED SUCCESSFULLY'
             echo '========================================='
         }
 
