@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-1'
 
-        ECR_REGISTRY = '776782461638.dkr.ecr.us-east-1.amazonaws.com'
+        ECR_REGISTRY = '955501536964'.dkr.ecr.us-east-1.amazonaws.com'
 
         FRONTEND_REPO = 'flower-frontend'
         BACKEND_REPO = 'flower-backend'
